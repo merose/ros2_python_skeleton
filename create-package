@@ -1,0 +1,33 @@
+#! /bin/bash
+
+fail() {
+    echo "Error: $1"
+    exit 1
+}
+
+if [ $# -ne 2 ]; then
+    echo "usage: `basename $0` pkg-name new-pkg-location"
+    exit 1
+fi
+
+PKG=$1
+DEST=$2
+
+mkdir -p $2 || fail "Could not create directory"
+echo "Created directory for new package: $DEST"
+
+echo "Copying skeleton files to new package..."
+(cd skeleton; tar cf - .) | (cd $DEST; tar xf -) || fail "Failed to copy files"
+
+echo "Setting package name..."
+
+cd $DEST || fail "Could not change directory"
+mv CHANGEME $PKG || fail "Could not change package name"
+mv resource/CHANGEME resource/$PKG || fail "Could not change resource name"
+
+sed -i -e "s;CHANGEME;$PKG;g" package.xml || fail "Editing package.xml"
+sed -i -e "s;CHANGEME;$PKG;g" setup.py || fail "Editing setup.py"
+sed -i -e "s;CHANGEME;$PKG;g" setup.cfg || fail "Editing setup.cfg"
+sed -i -e "s;CHANGEME;$PKG;g" README.md || fail "Editing README.md"
+
+echo "New package $PKG complete."
