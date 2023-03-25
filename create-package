@@ -22,7 +22,8 @@ echo "Copying skeleton files to new package..."
 echo "Setting package name..."
 
 cd $DEST || fail "Could not change directory"
-mv CHANGEME $PKG || fail "Could not change package name"
+mkdir $PKG || fail "Could not create package source directory"
+touch $PKG/.gitignore || fail "Could not create empty file in source directory"
 mv resource/CHANGEME resource/$PKG || fail "Could not change resource name"
 
 sed -i -e "s;CHANGEME;$PKG;g" package.xml || fail "Editing package.xml"
